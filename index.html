@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+    rel="stylesheet"
+  />
+  <script src="./src/index.js"></script>
+  <body>
+    <div id="testButton"></div>
+
+    <div>-------------------------------------------</div>
+
+    <div id="testButton1"></div>
+
+    <script>
+      capi.follow.render('testButton', {
+        fromAddr: '1',
+        toAddr: '2',
+        namespace: '3',
+        network: '4',
+      });
+
+      capi.follow.render('testButton1', {
+        fromAddr: '2',
+        toAddr: '3',
+        namespace: '4',
+        network: '5',
+      });
+    </script>
+  </body>
+</html>

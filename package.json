@@ -1,0 +1,43 @@
+{
+  "name": "connectjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rollup-build": "rollup -c",
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cybertino/connectJS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cybertino/connectJS/issues"
+  },
+  "homepage": "https://github.com/cybertino/connectJS#readme",
+  "dependencies": {
+    "@cyberlab/cyberconnect": "^2.1.0",
+    "example-typescript-package": "^0.2.2",
+    "local-web-server": "^5.1.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.16.4",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "css-loader": "^6.5.1",
+    "rollup-plugin-styles": "^3.14.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "style-loader": "^3.3.1",
+    "svg-url-loader": "^7.1.1",
+    "terser-webpack-plugin": "^5.2.5",
+    "webpack": "^5.64.2",
+    "webpack-cli": "^4.9.1"
+  }
+}

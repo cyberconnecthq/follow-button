@@ -1,38 +1,52 @@
-var capi = (window.capi = window.capi || {});
-var cyberConnectCSSId = 'cyberConnectCSS';
+import CyberConnect from '@cyberlab/cyberconnect';
+import { followStatus } from './query.js';
+// import logoLeftIconSvg from './icon/logo-left.svg';
+// import logoRightIconSvg from './icon/logo-right.svg';
+import './index.css';
 
-if (document) {
-  // Import CSS
-  if (!document.getElementById(cyberConnectCSSId)) {
-    var head = document.getElementsByTagName('head')[0];
-    var link = document.createElement('link');
-    link.id = cyberConnectCSSId;
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.href = './src/index.css';
-    link.media = 'all';
-    head.appendChild(link);
-  }
+function initApi() {
+  window.capi = window.capi || {
+    follow: {
+      render: cyberConnectFollowButtonRender,
+      relations: {},
+    },
+  };
+
+  capi = window.capi;
 }
 
-async function handleButtonClick(relation, event, buttonWrapper, followStatus) {
+initApi();
+
+function initCyberConnect({ ethProvider, namespace, env }) {
+  if (capi.follow.connectInstance) {
+    return;
+  }
+
+  console.log(CyberConnect);
+
+  capi.follow.connectInstance = new CyberConnect({
+    ethProvider,
+    namespace,
+    env,
+  });
+}
+
+async function handleButtonClick(relation, toAddr, buttonWrapper) {
   console.log('click');
   const following = capi.follow.relations[relation]?.following;
   buttonWrapper.classList.add('loading');
 
-  if (following) {
-    await unfollow();
-    capi.follow.relations[relation].following = false;
-    followStatus.innerHTML = 'Follow';
-  } else {
-    await follow();
-    capi.follow.relations[relation].following = true;
-    followStatus.innerHTML = 'Following';
-    buttonWrapper.classList.remove('logoRotate');
+  try {
+    if (following) {
+      await unfollow(toAddr);
+    } else {
+      await follow(toAddr);
+    }
+    updateElementStatus(relation, !following);
+  } catch (e) {
+    console.error(e);
+    buttonWrapper.classList.remove('loading');
   }
-
-  buttonWrapper.classList.remove('loading');
-  document.dispatchEvent(event);
 }
 
 function handleButtonMouseEnter(relation, buttonWrapper, followStatus) {
@@ -76,39 +90,24 @@ function createLoadingElement() {
   return circleProgress;
 }
 
-function followEventHandler(e) {
-  console.log(e);
-}
-
-function addFollowEventListener({
-  element,
-  fromAddr,
-  toAddr,
-  namespace,
-  following,
-}) {
+function addFollowElement({ button, fromAddr, toAddr, namespace, following }) {
   const relation = fromAddr + toAddr + namespace;
   const relations = capi.follow.relations;
 
   if (relations[relation]) {
     console.log('already has the relation: ', relation);
-    relations[relation].elements.push(element);
-    return relations[relation].event;
+    relations[relation].buttons.push(button);
   } else {
-    const event = new Event(relation, { bubbles: true });
     relations[relation] = {
-      elements: [element],
+      buttons: [button],
       following,
-      event,
     };
-    document.addEventListener(relation, followEventHandler);
-    return event;
   }
 }
 
 async function cyberConnectFollowButtonRender(
   id,
-  { fromAddr, toAddr, namespace, network, provider }
+  { fromAddr, toAddr, namespace, ethProvider, env }
 ) {
   const buttonWrapper = document.getElementById(id);
   if (!buttonWrapper) {
@@ -116,17 +115,33 @@ async function cyberConnectFollowButtonRender(
     return;
   }
 
-  const following = await getFollowStatus();
+  if (buttonWrapper.children.length > 0) {
+    console.error('Already render the button');
+    return;
+  }
 
-  const event = addFollowEventListener({
-    element: buttonWrapper,
+  initCyberConnect({ ethProvider, namespace, env });
+
+  const relation = fromAddr + toAddr + namespace;
+  const relations = capi.follow.relations;
+  let following = false;
+
+  if (!relations[relation]) {
+    following = await getFollowStatus({
+      fromAddr,
+      toAddr,
+      namespace,
+      env,
+    });
+  }
+
+  addFollowElement({
+    button: buttonWrapper,
     fromAddr,
     toAddr,
     namespace,
     following,
   });
-
-  const relation = fromAddr + toAddr + namespace;
 
   buttonWrapper.classList.add('cyberConnectFollowButtonWrapper');
 
@@ -139,11 +154,13 @@ async function cyberConnectFollowButtonRender(
 
   const logoLeftIcon = document.createElement('img');
   logoLeftIcon.classList.add('connectLogoPart', 'connectLogoPartLeft');
-  logoLeftIcon.src = 'src/icon/logo-left.svg';
+  // logoLeftIcon.src = logoLeftIconSvg;
+  logoLeftIcon.src = '';
 
   const logoRightIcon = document.createElement('img');
   logoRightIcon.classList.add('connectLogoPart', 'connectLogoPartRight');
-  logoRightIcon.src = 'src/icon/logo-right.svg';
+  // logoRightIcon.src = logoRightIconSvg;
+  logoRightIcon.src = '';
 
   const buttonTextFollowStatus = document.createElement('div');
   buttonTextFollowStatus.classList.add('buttonText', 'followStatus');
@@ -164,7 +181,7 @@ async function cyberConnectFollowButtonRender(
     handleButtonMouseLeave(relation, buttonWrapper, buttonTextFollowStatus)
   );
   button.addEventListener('click', () => {
-    handleButtonClick(relation, event, buttonWrapper, buttonTextFollowStatus);
+    handleButtonClick(relation, toAddr, buttonWrapper, buttonTextFollowStatus);
   });
 
   // Assmble button
@@ -173,33 +190,56 @@ async function cyberConnectFollowButtonRender(
   buttonWrapper.append(button, circleProgress);
 }
 
-var capi = {
-  follow: {
-    render: cyberConnectFollowButtonRender,
-    relations: {},
-  },
-};
+async function getFollowStatus({ fromAddr, toAddr, namespace, env }) {
+  const result = await followStatus({ fromAddr, toAddr, namespace, env });
+  return !!result?.data?.followStatus?.isFollowing;
+}
 
-function getFollowStatus() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(false);
-    }, (Math.floor(Math.random() * 1) + 1) * 1000);
+function updateElementStatus(relation, following) {
+  const relations = capi.follow.relations;
+
+  relations[relation].following = following;
+
+  relations[relation].buttons.forEach((button) => {
+    if (button) {
+      const followStatus = button.querySelector('.followStatus')[0];
+      if (following) {
+        if (followStatus) {
+          followStatus.innerHTML = 'Following';
+        }
+        button.classList.add('logoRotate');
+      } else {
+        if (followStatus) {
+          followStatus.innerHTML = 'Follow';
+        }
+      }
+      button.classList.remove('loading');
+    }
   });
 }
 
-function follow() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, (Math.floor(Math.random() * 1) + 1) * 1000);
-  });
+async function follow(toAddr) {
+  const connectInstance = capi.follow.connectInstance;
+  if (!connectInstance) {
+    throw 'Can not find the connect instance';
+  }
+
+  try {
+    const resutl = await connectInstance.connect(toAddr);
+  } catch (e) {
+    throw ('follow error: ', e);
+  }
 }
 
-function unfollow() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, (Math.floor(Math.random() * 1) + 1) * 1000);
-  });
+async function unfollow(toAddr) {
+  const connectInstance = capi.follow.connectInstance;
+  if (!connectInstance) {
+    throw 'Can not find the connect instance';
+  }
+
+  try {
+    const resutl = await connectInstance.disconnect(toAddr);
+  } catch (e) {
+    throw ('unfollow error: ', e);
+  }
 }

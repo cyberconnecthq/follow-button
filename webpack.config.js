@@ -1,5 +1,3 @@
-var webpack = require('webpack');
-const TerserPlugin = require('terser-webpack-plugin');
 var path = require('path');
 
 module.exports = {
@@ -22,15 +20,10 @@ module.exports = {
       },
     ],
   },
-  optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin()],
-  },
   entry: './src/index.js',
   output: {
     path: path.join(__dirname, ''),
-    filename: 'connect.min.js',
+    filename: 'cyberconnect.min.js',
   },
   mode: 'production',
-  // plugins: [new webpack.optimize.UglifyJsPlugin({ minimize: true })],
 };

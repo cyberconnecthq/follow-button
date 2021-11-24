@@ -1,38 +1,74 @@
 import CyberConnect from '@cyberlab/cyberconnect';
 import { followStatus } from './query.js';
-// import logoLeftIconSvg from './icon/logo-left.svg';
-// import logoRightIconSvg from './icon/logo-right.svg';
+import logoLeftIconSvg from './icon/logo-left.svg';
+import logoRightIconSvg from './icon/logo-right.svg';
 import './index.css';
 
-function initApi() {
+// Fix the `Buffer is not defined` error from rpc-utils
+global.Buffer = global.Buffer || require('buffer').Buffer;
+
+function init() {
   window.capi = window.capi || {
     follow: {
+      init: initApi,
       render: cyberConnectFollowButtonRender,
       relations: {},
+      connectInstance: null,
+      namespace: '',
+      ethProvider: '',
+      env: 'PRODUCTION',
+      fromAddr: '',
     },
   };
 
   capi = window.capi;
 }
 
-initApi();
-
-function initCyberConnect({ ethProvider, namespace, env }) {
+async function initApi({ namespace, ethProvider, env }) {
   if (capi.follow.connectInstance) {
     return;
   }
 
-  console.log(CyberConnect);
+  if (!namespace) {
+    throw {
+      code: 'EmptyNamespace',
+      message: 'Namespace can not be empty',
+    };
+  }
+
+  if (!!env && env !== 'PRODUCTION' && env !== 'STAGING') {
+    throw {
+      code: 'WrongEnvValue',
+      message: 'The value of env can only be either PRODUCTION or STAGING',
+    };
+  }
 
   capi.follow.connectInstance = new CyberConnect({
     ethProvider,
     namespace,
-    env,
+    env: env || 'PRODUCTION',
   });
+
+  capi.follow = { ...capi.follow, namespace, ethProvider, env };
+
+  const addresses = await ethProvider.request({ method: 'eth_accounts' });
+  if (addresses && addresses[0]) {
+    capi.follow.fromAddr = addresses[0];
+  } else {
+    throw {
+      code: 'NoETHAccount',
+      message: 'Can not find the wallet address by the given provider',
+    };
+  }
 }
 
-async function handleButtonClick(relation, toAddr, buttonWrapper) {
-  console.log('click');
+async function handleButtonClick({
+  relation,
+  toAddr,
+  buttonWrapper,
+  onSuccess,
+  onFailure,
+}) {
   const following = capi.follow.relations[relation]?.following;
   buttonWrapper.classList.add('loading');
 
@@ -43,7 +79,23 @@ async function handleButtonClick(relation, toAddr, buttonWrapper) {
       await follow(toAddr);
     }
     updateElementStatus(relation, !following);
+    if (onSuccess) {
+      if (following) {
+        onSuccess({
+          code: 'UnfollowSuccess',
+          toAddr,
+        });
+      } else {
+        onSuccess({
+          code: 'FollowSuccess',
+          toAddr,
+        });
+      }
+    }
   } catch (e) {
+    if (onFailure) {
+      onFailure(e);
+    }
     console.error(e);
     buttonWrapper.classList.remove('loading');
   }
@@ -95,7 +147,6 @@ function addFollowElement({ button, fromAddr, toAddr, namespace, following }) {
   const relations = capi.follow.relations;
 
   if (relations[relation]) {
-    console.log('already has the relation: ', relation);
     relations[relation].buttons.push(button);
   } else {
     relations[relation] = {
@@ -107,25 +158,30 @@ function addFollowElement({ button, fromAddr, toAddr, namespace, following }) {
 
 async function cyberConnectFollowButtonRender(
   id,
-  { fromAddr, toAddr, namespace, ethProvider, env }
+  { fromAddr, toAddr, onSuccess, onFailure }
 ) {
   const buttonWrapper = document.getElementById(id);
   if (!buttonWrapper) {
-    console.error('Can not find the target id');
+    const event = {
+      code: 'NoTargetElement',
+      message: 'Can not find the element with the target id',
+    };
+    if (onFailure) {
+      onFailure(event);
+    }
+    console.error(event);
     return;
   }
 
-  if (buttonWrapper.children.length > 0) {
-    console.error('Already render the button');
-    return;
-  }
+  buttonWrapper.innerHTML = '';
 
-  initCyberConnect({ ethProvider, namespace, env });
-
+  const env = capi.follow.env;
+  const namespace = capi.follow.namespace;
   const relation = fromAddr + toAddr + namespace;
   const relations = capi.follow.relations;
   let following = false;
 
+  // Query follow status
   if (!relations[relation]) {
     following = await getFollowStatus({
       fromAddr,
@@ -135,6 +191,7 @@ async function cyberConnectFollowButtonRender(
     });
   }
 
+  // Group buttons with the same relation
   addFollowElement({
     button: buttonWrapper,
     fromAddr,
@@ -154,13 +211,11 @@ async function cyberConnectFollowButtonRender(
 
   const logoLeftIcon = document.createElement('img');
   logoLeftIcon.classList.add('connectLogoPart', 'connectLogoPartLeft');
-  // logoLeftIcon.src = logoLeftIconSvg;
-  logoLeftIcon.src = '';
+  logoLeftIcon.src = logoLeftIconSvg;
 
   const logoRightIcon = document.createElement('img');
   logoRightIcon.classList.add('connectLogoPart', 'connectLogoPartRight');
-  // logoRightIcon.src = logoRightIconSvg;
-  logoRightIcon.src = '';
+  logoRightIcon.src = logoRightIconSvg;
 
   const buttonTextFollowStatus = document.createElement('div');
   buttonTextFollowStatus.classList.add('buttonText', 'followStatus');
@@ -181,7 +236,13 @@ async function cyberConnectFollowButtonRender(
     handleButtonMouseLeave(relation, buttonWrapper, buttonTextFollowStatus)
   );
   button.addEventListener('click', () => {
-    handleButtonClick(relation, toAddr, buttonWrapper, buttonTextFollowStatus);
+    handleButtonClick({
+      relation,
+      toAddr,
+      buttonWrapper,
+      onSuccess,
+      onFailure,
+    });
   });
 
   // Assmble button
@@ -197,12 +258,11 @@ async function getFollowStatus({ fromAddr, toAddr, namespace, env }) {
 
 function updateElementStatus(relation, following) {
   const relations = capi.follow.relations;
-
   relations[relation].following = following;
 
   relations[relation].buttons.forEach((button) => {
     if (button) {
-      const followStatus = button.querySelector('.followStatus')[0];
+      const followStatus = button.querySelector('.followStatus');
       if (following) {
         if (followStatus) {
           followStatus.innerHTML = 'Following';
@@ -221,25 +281,40 @@ function updateElementStatus(relation, following) {
 async function follow(toAddr) {
   const connectInstance = capi.follow.connectInstance;
   if (!connectInstance) {
-    throw 'Can not find the connect instance';
+    throw {
+      code: 'FollowError',
+      message: 'Can not find the connect instance',
+    };
   }
 
   try {
-    const resutl = await connectInstance.connect(toAddr);
+    await connectInstance.connect(toAddr);
   } catch (e) {
-    throw ('follow error: ', e);
+    throw {
+      code: 'FollowError',
+      message: e.message || e,
+    };
   }
 }
 
 async function unfollow(toAddr) {
   const connectInstance = capi.follow.connectInstance;
   if (!connectInstance) {
-    throw 'Can not find the connect instance';
+    throw {
+      code: 'UnfollowError',
+      message: 'Can not find the connect instance',
+    };
   }
 
   try {
-    const resutl = await connectInstance.disconnect(toAddr);
+    await connectInstance.disconnect(toAddr);
   } catch (e) {
-    throw ('unfollow error: ', e);
+    console.log(e);
+    throw {
+      code: 'UnfollowError',
+      message: e.message || e,
+    };
   }
 }
+
+init();

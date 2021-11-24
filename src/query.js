@@ -1,8 +1,8 @@
 const endpoints = {
-  stg: {
+  STAGING: {
     cyberConnectApi: 'https://api.stg.cybertino.io/connect/',
   },
-  production: {
+  PRODUCTION: {
     cyberConnectApi: 'https://api.cybertino.io/connect/',
   },
 };
@@ -33,7 +33,7 @@ export const followStatus = ({ fromAddr, toAddr, namespace, env }) => {
     env,
   });
 
-  const url = (endpoints[env] || endpoints['production']).cyberConnectApi;
+  const url = (endpoints[env] || endpoints['PRODUCTION']).cyberConnectApi;
 
   return request(url, {
     query: schema,

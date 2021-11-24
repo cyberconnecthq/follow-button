@@ -158,7 +158,7 @@ function addFollowElement({ button, fromAddr, toAddr, namespace, following }) {
 
 async function cyberConnectFollowButtonRender(
   id,
-  { fromAddr, toAddr, onSuccess, onFailure }
+  { toAddr, onSuccess, onFailure }
 ) {
   const buttonWrapper = document.getElementById(id);
   if (!buttonWrapper) {
@@ -175,6 +175,7 @@ async function cyberConnectFollowButtonRender(
 
   buttonWrapper.innerHTML = '';
 
+  const fromAddr = capi.follow.fromAddr;
   const env = capi.follow.env;
   const namespace = capi.follow.namespace;
   const relation = fromAddr + toAddr + namespace;

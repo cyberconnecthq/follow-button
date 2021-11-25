@@ -1,2 +1,9 @@
-node_modules
-cyberconnect.min.js*
+node_modules/
+lerna-debug.log
+.idea
+.pinning.store
+.vscode
+*.iml
+
+packages/*/node_modules/
+packages/*/package-lock.json

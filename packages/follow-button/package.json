@@ -1,0 +1,33 @@
+{
+  "name": "@cyberconnect/follow-button",
+  "version": "1.0.0",
+  "description": "Cyber Connect follow button javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "sideEffects": [
+    "./src/index.js",
+    "*.css"
+  ],
+  "keywords": [
+    "CyberConnect",
+    "Connect"
+  ],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/cybertino/js-cyberconnect/follow-button#readme",
+  "dependencies": {
+    "@cyberlab/cyberconnect": "^2.5.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.16.4",
+    "css-loader": "^6.5.1",
+    "style-loader": "^3.3.1",
+    "svg-url-loader": "^7.1.1",
+    "webpack": "^5.64.2",
+    "webpack-bundle-analyzer": "^4.5.0",
+    "webpack-cli": "^4.9.1"
+  }
+}

@@ -2,7 +2,9 @@
 
 Embedding a follow button on your website is a quick and easy way to follow/unfollow other people on the given namespace. Let's start.
 
-The Cyber Connect follow button SDK for JavaScript doesn't have any standalone files that need to be downloaded or installed, instead you simply need to include a short piece of regular JavaScript in your HTML that will asynchronously load the SDK into your pages. The async load means that it does not block loading other elements of your page.
+The CyberConnect follow button SDK for JavaScript doesn't have any standalone files that need to be downloaded or installed, instead you simply need to include a short piece of regular JavaScript in your HTML that will asynchronously load the SDK into your pages. The async load means that it does not block loading other elements of your page.
+
+See the [API doc](https://docs.cyberconnect.me/follow-button) for more information.
 
 **Create a follow button**
 

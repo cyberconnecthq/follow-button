@@ -6,7 +6,7 @@ The Cyber Connect follow button SDK for JavaScript doesn't have any standalone f
 
 **Create a follow button**
 
-First you need to include the `cyberconnect.min.js` script and call `follow.init` after the script loaded.
+First you need to include the [https://connect.cybertino.io/js/cyberconnect-follow-button.min.js](https://connect.cybertino.io/js/cyberconnect-follow-button.min.js) script and call `follow.init` after the script loaded.
 
 ```jsx
 <script>
@@ -20,7 +20,7 @@ async function initCyberConnect() {
 <script src="cyberconnect.min.js" async defer onload="initCyberConnect"></script>
 ```
 
-Then, to create a follow button, add an `div` element to contain a button `id` and call `follow.render` with the target wallet address
+Then, to create a follow button, add an `div` element to contain a button `id` and call `follow.render` with the button `id` and the target wallet address
 
 ```jsx
 <body>

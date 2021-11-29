@@ -17,7 +17,7 @@ async function initCyberConnect() {
 	env: 'PRODUCTION' // env decides the endpoints. Now we have STAGING and PRODUCTION. The default value is PRODUCTION
     });
 </script>
-<script src="cyberconnect.min.js" async defer onload="initCyberConnect"></script>
+<script src="https://connect.cybertino.io/js/cyberconnect-follow-button.min.js" defer onload="initCyberConnect"></script>
 ```
 
 Then, to create a follow button, add an `div` element to contain a button `id` and call `follow.render` with the button `id` and the target wallet address

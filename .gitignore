@@ -7,3 +7,6 @@ lerna-debug.log
 
 packages/*/node_modules/
 packages/*/package-lock.json
+packages/*/lib
+yarn.lock
+example

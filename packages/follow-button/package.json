@@ -22,11 +22,14 @@
     "@cyberlab/cyberconnect": "^2.5.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.16.0",
     "@babel/plugin-transform-runtime": "^7.16.4",
+    "@babel/preset-env": "^7.16.4",
+    "babel-loader": "^8.2.3",
     "css-loader": "^6.5.1",
     "style-loader": "^3.3.1",
     "svg-url-loader": "^7.1.1",
-    "webpack": "^5.64.2",
+    "webpack": "^5.64.4",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.1"
   }

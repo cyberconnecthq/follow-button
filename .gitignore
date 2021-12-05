@@ -6,7 +6,5 @@ lerna-debug.log
 *.iml
 
 packages/*/node_modules/
-packages/*/package-lock.json
+packages/*/yarn.lock
 packages/*/lib
-yarn.lock
-example

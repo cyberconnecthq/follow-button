@@ -1,0 +1,25 @@
+.App {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.address {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.connect-button {
+  width: 200px;
+  height: 80px;
+  font-size: 18px;
+  cursor: pointer;
+}

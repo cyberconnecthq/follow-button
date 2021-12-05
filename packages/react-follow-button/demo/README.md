@@ -4,4 +4,8 @@
 
 ## Getting Started
 
-- `yarn & yarn start`
+```sh
+yarn
+
+yarn start
+```

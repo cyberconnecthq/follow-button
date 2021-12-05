@@ -12,7 +12,12 @@ import LogoRightIcon from './LogoRight';
 import { LoadingIcon } from './Loading';
 import { endpoints } from '@cyberlab/cyberconnect/lib/network';
 import { followStatus } from './../utils/queries';
-import CyberConnect, { Env as CyberconnectEnv } from '@cyberlab/cyberconnect';
+import CyberConnect, {
+  Env,
+  Blockchain,
+  getAddressByProvider,
+} from '@cyberlab/cyberconnect';
+import { Config } from '@cyberlab/cyberconnect/lib/types';
 
 interface SuccessEvent {
   code: string;
@@ -25,22 +30,21 @@ interface FailureEvent {
 }
 
 interface StaticProperty {
-  cyberConnect: null | CyberConnect;
+  cyberConnect: CyberConnect | null;
 }
 
-export interface FollowButtonProps {
-  provider: any;
-  namespace: string;
-  env?: CyberconnectEnv;
+export type FollowButtonProps = Config & {
   toAddr: string;
   onSuccess?: (event: SuccessEvent) => void;
   onFailure?: (event: FailureEvent) => void;
-}
+};
 
 export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
   provider,
   namespace,
-  env = CyberconnectEnv.PRODUCTION,
+  env = Env.PRODUCTION,
+  chain = Blockchain.ETH,
+  chainRef,
   toAddr = '',
   onSuccess,
   onFailure,
@@ -209,22 +213,27 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
       };
     }
 
+    // @ts-ignore
     FollowButton.cyberConnect = new CyberConnect({
-      provider: provider,
+      provider,
       namespace,
-      env: env || CyberconnectEnv.PRODUCTION,
+      chain,
+      chainRef,
+      env,
     });
+  }, [namespace, provider, env]);
 
-    const addresses = await provider.request({ method: 'eth_accounts' });
-    if (addresses && addresses[0]) {
-      setFromAddr(addresses[0]);
+  const getUserAddress = useCallback(async () => {
+    const address = await getAddressByProvider(provider, chain);
+    if (address) {
+      setFromAddr(address);
     } else {
       throw {
         code: 'NoETHAccount',
         message: 'Can not find the wallet address by the given provider',
       };
     }
-  }, [namespace, provider, env]);
+  }, [provider, chain]);
 
   useEffect(() => {
     try {
@@ -236,6 +245,10 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
       }
     }
   }, [initCyberConnect, onFailure]);
+
+  useEffect(() => {
+    getUserAddress();
+  }, [getUserAddress]);
 
   useEffect(() => {
     getFollowStatus();

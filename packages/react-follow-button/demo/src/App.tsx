@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 import Web3 from 'web3';
-import { FollowButton } from '@cyberconnect/react-follow-button';
+import {
+  FollowButton,
+  Env,
+  Blockchain,
+} from '@cyberconnect/react-follow-button';
 
 function App() {
   const [account, setAccount] = useState<string>('');
@@ -21,26 +25,31 @@ function App() {
 
   return (
     <div className="App">
-      <div>
-        {isWalletConnected ? (
-          <div>
-            <div>Address: {account}</div>
-            <FollowButton
-              provider={Web3.givenProvider}
-              namespace="CyberConnect"
-              toAddr="0xe6aab1f16ff560d309ed7ce8e08d290306a0906c"
-              onSuccess={(e) => {
-                console.log(e);
-              }}
-              onFailure={(e) => {
-                console.log(e);
-              }}
-            />
+      {isWalletConnected ? (
+        <div className="demo">
+          <div className="address">
+            <b>Account:</b> {account}
           </div>
-        ) : (
-          <button onClick={connectWallet}>Connect Wallet</button>
-        )}
-      </div>
+          <FollowButton
+            key="0xe6aab1f16ff560d309ed7ce8e08d290306a0906c"
+            provider={Web3.givenProvider}
+            namespace="CyberConnect"
+            toAddr="0xe6aab1f16ff560d309ed7ce8e08d290306a0906c"
+            env={Env.PRODUCTION}
+            chain={Blockchain.ETH}
+            onSuccess={(e) => {
+              console.log(e);
+            }}
+            onFailure={(e) => {
+              console.log(e);
+            }}
+          />
+        </div>
+      ) : (
+        <button className="connect-button" onClick={connectWallet}>
+          Connect Wallet
+        </button>
+      )}
     </div>
   );
 }

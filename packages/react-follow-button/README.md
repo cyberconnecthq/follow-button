@@ -12,7 +12,11 @@
 ---
 
 ```tsx
-import { FollowButton } from '@cyberconnect/react-follow-button';
+import {
+  FollowButton,
+  Env,
+  Blockchain,
+} from '@cyberconnect/react-follow-button';
 
 function App() {
   <div className="App">
@@ -20,6 +24,8 @@ function App() {
       provider={ethProvider}
       namespace="CyberConnect"
       toAddr="0xe6aab1f16ff560d309ed7ce8e08d290306a0906c"
+      env={Env.STAGING}
+      chain={Blockchain.ETH}
       onSuccess={(e) => {
         console.log(e);
       }}
@@ -30,6 +36,8 @@ function App() {
   </div>;
 }
 ```
+
+See [API]('https://docs.cyberconncet.me/connect-and-disconnect#basic-usage') for more details.
 
 When the button triggered, the callbacks will be called with the following event object:
 

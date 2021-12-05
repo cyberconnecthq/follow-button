@@ -1,2 +1,2 @@
-export { Env, solana } from '@cyberlab/cyberconnect';
+export * from '@cyberlab/cyberconnect/lib/types';
 export * from './components';

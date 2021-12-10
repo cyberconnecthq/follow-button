@@ -44,7 +44,7 @@ async function initApi({ namespace, ethProvider, env }) {
   }
 
   capi.follow.connectInstance = new CyberConnect({
-    ethProvider,
+    provider: ethProvider,
     namespace,
     env: env || 'PRODUCTION',
   });

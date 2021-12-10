@@ -33,7 +33,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.join(__dirname, ''),
-    filename: 'cyberconnect.min.js',
+    filename: 'cyberconnect-follow-button.min.js',
   },
   mode: 'production',
 };

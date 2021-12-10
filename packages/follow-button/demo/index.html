@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+  </head>
+
+  <body>
+    <div id="follow-button"></div>
+
+    <script
+      src="https://connect.cybertino.io/js/cyberconnect-follow-button.min.js"
+      defer
+      onload="initCyberConnect()"
+    ></script>
+    <script>
+      async function initCyberConnect() {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        await capi.follow.init({
+          ethProvider: provider.provider, // ethProvider is an Ethereum provider
+          namespace: 'CyberConnect',
+          env: 'PRODUCTION', // env decides the endpoints. Now we have STAGING and PRODUCTION. The default value is PRODUCTION
+        });
+        capi.follow.render('follow-button', {
+          toAddr: '0xe6aab1f16ff560d309ed7ce8e08d290306a0906c',
+          onSuccess: (event) => {
+            console.log(event);
+          },
+          onFailure: (event) => {
+            console.log(event);
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

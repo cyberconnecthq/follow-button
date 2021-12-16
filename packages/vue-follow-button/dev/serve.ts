@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp } from 'vue-demi';
 import Dev from './serve.vue';
 
 const app = createApp(Dev);

@@ -1,4 +1,3 @@
-// rollup.config.js
 import fs from 'fs';
 import path from 'path';
 import vue from 'rollup-plugin-vue';
@@ -7,8 +6,8 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
+import json from '@rollup/plugin-json';
 import PostCSS from 'rollup-plugin-postcss';
-import { terser } from 'rollup-plugin-terser';
 import ttypescript from 'ttypescript';
 import typescript from 'rollup-plugin-typescript2';
 import minimist from 'minimist';
@@ -68,23 +67,13 @@ const baseConfig = {
   },
 };
 
-// ESM/UMD/IIFE shared settings: externals
-// Refer to https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
 const external = [
-  // list external dependencies, exactly the way it is written in the import statement.
-  // eg. 'jquery'
   'vue',
+  'vue-demi',
+  '@cyberlab/cyberconnect',
+  '@cyberlab/cyberconnect/lib/network',
 ];
 
-// UMD/IIFE shared settings: output.globals
-// Refer to https://rollupjs.org/guide/en#output-globals for details
-const globals = {
-  // Provide global variable names to replace your external imports
-  // eg. jquery: '$'
-  vue: 'Vue',
-};
-
-// Customize configs for individual targets
 const buildFormats = [];
 if (!argv.format || argv.format === 'es') {
   const esConfig = {
@@ -101,6 +90,7 @@ if (!argv.format || argv.format === 'es') {
       ...baseConfig.plugins.preVue,
       vue(baseConfig.plugins.vue),
       ...baseConfig.plugins.postVue,
+      json(),
       // Only use typescript for declarations - babel will
       // do actual js transformations
       typescript({
@@ -125,56 +115,4 @@ if (!argv.format || argv.format === 'es') {
   buildFormats.push(esConfig);
 }
 
-if (!argv.format || argv.format === 'cjs') {
-  const umdConfig = {
-    ...baseConfig,
-    external,
-    output: {
-      compact: true,
-      file: 'dist/vue-follow-button.ssr.js',
-      format: 'cjs',
-      name: 'VueFollowButton',
-      exports: 'auto',
-      globals,
-    },
-    plugins: [
-      replace(baseConfig.plugins.replace),
-      ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
-      ...baseConfig.plugins.postVue,
-      babel(baseConfig.plugins.babel),
-    ],
-  };
-  buildFormats.push(umdConfig);
-}
-
-if (!argv.format || argv.format === 'iife') {
-  const unpkgConfig = {
-    ...baseConfig,
-    external,
-    output: {
-      compact: true,
-      file: 'dist/vue-follow-button.min.js',
-      format: 'iife',
-      name: 'VueFollowButton',
-      exports: 'auto',
-      globals,
-    },
-    plugins: [
-      replace(baseConfig.plugins.replace),
-      ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
-      ...baseConfig.plugins.postVue,
-      babel(baseConfig.plugins.babel),
-      terser({
-        output: {
-          ecma: 5,
-        },
-      }),
-    ],
-  };
-  buildFormats.push(unpkgConfig);
-}
-
-// Export config
 export default buildFormats;

@@ -1,4 +1,4 @@
-import { App, Plugin } from 'vue-demi';
+import { App, Plugin } from 'vue';
 
 // Import vue component
 import component from '@/components/vue-follow-button.vue';

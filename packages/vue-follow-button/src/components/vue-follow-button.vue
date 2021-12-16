@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from 'vue-demi';
+import { PropType, defineComponent } from 'vue';
 import Loading from '@/components/loading.vue';
 import LogoLeft from '@/components/logo-left.vue';
 import LogoRight from '@/components/logo-right.vue';

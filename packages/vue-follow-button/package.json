@@ -33,8 +33,7 @@
     "postbuild": "rimraf ./dist/types/dev ./dist/types/src/entry.d.ts"
   },
   "dependencies": {
-    "@cyberlab/cyberconnect": "^4.0.0",
-    "vue-demi": "^0.12.1"
+    "@cyberlab/cyberconnect": "^4.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
@@ -66,13 +65,7 @@
   },
   "peerDependencies": {
     "@cyberlab/cyberconnect": "^4.0.0",
-    "@vue/composition-api": "^1.4.0",
-    "vue": "^2.6.14  || ^3.0.5"
-  },
-  "peerDependenciesMeta": {
-    "@vue/composition-api": {
-      "optional": true
-    }
+    "vue": "^3.0.5"
   },
   "engines": {
     "node": ">=12"

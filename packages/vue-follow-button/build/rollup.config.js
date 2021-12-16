@@ -69,7 +69,6 @@ const baseConfig = {
 
 const external = [
   'vue',
-  'vue-demi',
   '@cyberlab/cyberconnect',
   '@cyberlab/cyberconnect/lib/network',
 ];

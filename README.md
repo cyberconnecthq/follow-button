@@ -9,6 +9,7 @@ follow-button is a monorepo containing the implementation of the CyberConncet fo
 | -- | -- | -- |
 | follow-button | CyberConnect follow button SDK for JavaScript | https://connect.cybertino.io/js/cyberconnect-follow-button.min.js
 | react-follow-button | React component for Cyberconnect follow | [@cyberconnect/react-follow-button](https://www.npmjs.com/package/@cyberconnect/react-follow-button) |
+| vue-follow-button | Vue component for Cyberconnect follow | [@cyberconnect/vue-follow-button](https://www.npmjs.com/package/@cyberconnect/vue-follow-button) |
 
 ## Button Style
 ---

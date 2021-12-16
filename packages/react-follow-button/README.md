@@ -13,6 +13,8 @@
 
 See demo [here]('https://github.com/cyberconnecthq/follow-button/tree/main/packages/react-follow-button/demo').
 
+> Now for the first time users it will show two signs with their wallet when clicking button, and there may be 5-10 seconds between those two sign.
+
 ```tsx
 import {
   FollowButton,

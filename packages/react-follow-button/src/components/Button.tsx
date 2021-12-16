@@ -134,27 +134,28 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
   }, []);
 
   const handleButtonClick = useCallback(async () => {
+    if (!FollowButton.cyberConnect) {
+      return;
+    }
+
     setLoading(true);
 
     try {
+      await FollowButton.cyberConnect?.authenticate();
+
       if (following) {
         await unfollow(toAddr);
       } else {
         await follow(toAddr);
       }
+
       updateElementStatus(!following);
+
       if (onSuccess) {
-        if (following) {
-          onSuccess({
-            code: 'UnfollowSuccess',
-            toAddr,
-          });
-        } else {
-          onSuccess({
-            code: 'FollowSuccess',
-            toAddr,
-          });
-        }
+        onSuccess({
+          code: following ? 'UnfollowSuccess' : 'FollowSuccess',
+          toAddr,
+        });
       }
     } catch (e: any) {
       if (onFailure) {

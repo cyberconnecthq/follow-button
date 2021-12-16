@@ -19,7 +19,7 @@
   "license": "ISC",
   "homepage": "https://github.com/cybertino/js-cyberconnect/follow-button#readme",
   "dependencies": {
-    "@cyberlab/cyberconnect": "^3.0.0"
+    "@cyberlab/cyberconnect": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",

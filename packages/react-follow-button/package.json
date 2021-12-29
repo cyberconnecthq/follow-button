@@ -1,6 +1,6 @@
 {
   "name": "@cyberconnect/react-follow-button",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -25,7 +25,7 @@
     "react-dom": ">=16.8.6"
   },
   "dependencies": {
-    "@cyberlab/cyberconnect": "^4.1.0",
+    "@cyberlab/cyberconnect": "^4.1.4",
     "react-jss": "^10.8.2"
   },
   "devDependencies": {

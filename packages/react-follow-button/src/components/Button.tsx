@@ -5,19 +5,20 @@ import React, {
   useEffect,
   useMemo,
   FC,
-} from 'react';
-import useStyles from './button.style';
-import LogoLeftIcon from './LogoLeft';
-import LogoRightIcon from './LogoRight';
-import { LoadingIcon } from './Loading';
-import { endpoints } from '@cyberlab/cyberconnect/lib/network';
-import { followStatus } from './../utils/queries';
+} from "react";
+import useStyles from "./button.style";
+import LogoLeftIcon from "./LogoLeft";
+import LogoRightIcon from "./LogoRight";
+import { LoadingIcon } from "./Loading";
+import { endpoints } from "@cyberlab/cyberconnect/lib/network";
+import { followStatus } from "./../utils/queries";
 import CyberConnect, {
   Env,
   Blockchain,
   getAddressByProvider,
-} from '@cyberlab/cyberconnect';
-import { Config } from '@cyberlab/cyberconnect/lib/types';
+} from "@cyberlab/cyberconnect";
+import { Config } from "@cyberlab/cyberconnect/lib/types";
+import { useIsMountedRef } from "./../hooks/useIsMountedRef";
 
 interface SuccessEvent {
   code: string;
@@ -45,17 +46,19 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
   env = Env.PRODUCTION,
   chain = Blockchain.ETH,
   chainRef,
-  toAddr = '',
+  toAddr = "",
   onSuccess,
   onFailure,
 }) => {
   const [following, setFollowing] = useState<boolean>(false);
-  const [buttonText, setButtonText] = useState<string>('Follow');
+  const [buttonText, setButtonText] = useState<string>("Follow");
   const [loading, setLoading] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [showButton, setShowButton] = useState<boolean>(false);
-  const [fromAddr, setFromAddr] = useState<string>('');
+  const [fromAddr, setFromAddr] = useState<string>("");
   const classes = useStyles();
+  //Only update state when the button is mounted. See: https://www.debuggr.io/react-update-unmounted-component/
+  const isMountedRef = useIsMountedRef();
 
   const apiURL = useMemo(() => {
     return endpoints[env].cyberConnectApi;
@@ -63,20 +66,20 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
 
   const handleButtonMouseEnter = useCallback(() => {
     if (following) {
-      setButtonText('Unfollow');
+      setButtonText("Unfollow");
     } else {
       if (wrapperRef.current) {
-        wrapperRef.current.classList.add('logoRotate');
+        wrapperRef.current.classList.add("logoRotate");
       }
     }
   }, [following, wrapperRef]);
 
   const handleButtonMouseLeave = useCallback(() => {
     if (following) {
-      setButtonText('Following');
+      setButtonText("Following");
     }
     if (wrapperRef.current) {
-      wrapperRef.current.classList.remove('logoRotate');
+      wrapperRef.current.classList.remove("logoRotate");
     }
   }, [following, wrapperRef]);
 
@@ -84,12 +87,12 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
     (following: boolean) => {
       setFollowing(following);
       if (following) {
-        setButtonText('Following');
+        setButtonText("Following");
         if (wrapperRef.current) {
-          wrapperRef.current.classList.remove('logoRotate');
+          wrapperRef.current.classList.remove("logoRotate");
         }
       } else {
-        setButtonText('Follow');
+        setButtonText("Follow");
       }
     },
     [wrapperRef]
@@ -99,8 +102,8 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
     const connectInstance = FollowButton.cyberConnect;
     if (!connectInstance) {
       throw {
-        code: 'FollowError',
-        message: 'Can not find the connect instance',
+        code: "FollowError",
+        message: "Can not find the connect instance",
       };
     }
 
@@ -108,7 +111,7 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
       await connectInstance.connect(toAddr);
     } catch (e: any) {
       throw {
-        code: 'FollowError',
+        code: "FollowError",
         message: e.message || e,
       };
     }
@@ -118,8 +121,8 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
     const connectInstance = FollowButton.cyberConnect;
     if (!connectInstance) {
       throw {
-        code: 'UnfollowError',
-        message: 'Can not find the connect instance',
+        code: "UnfollowError",
+        message: "Can not find the connect instance",
       };
     }
 
@@ -127,7 +130,7 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
       await connectInstance.disconnect(toAddr);
     } catch (e: any) {
       throw {
-        code: 'UnfollowError',
+        code: "UnfollowError",
         message: e.message || e,
       };
     }
@@ -153,7 +156,7 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
 
       if (onSuccess) {
         onSuccess({
-          code: following ? 'UnfollowSuccess' : 'FollowSuccess',
+          code: following ? "UnfollowSuccess" : "FollowSuccess",
           toAddr,
         });
       }
@@ -191,9 +194,11 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
       url: apiURL,
     });
 
+    if (!isMountedRef) return;
+
     if (result?.data?.followStatus?.isFollowing) {
       setFollowing(true);
-      setButtonText('Following');
+      setButtonText("Following");
     }
 
     if (!showButton) {
@@ -201,16 +206,16 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
     }
   }, [fromAddr, toAddr, namespace, apiURL, showButton]);
 
-  const initCyberConnect = useCallback(async () => {
+  const initCyberConnect = useCallback(() => {
     if (FollowButton.cyberConnect) {
       return;
     }
 
     if (!namespace) {
-      console.error('Namespace can not be empty');
+      console.error("Namespace can not be empty");
       throw {
-        code: 'EmptyNamespace',
-        message: 'Namespace can not be empty',
+        code: "EmptyNamespace",
+        message: "Namespace can not be empty",
       };
     }
 
@@ -226,13 +231,15 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
 
   const getUserAddress = useCallback(async () => {
     const address = await getAddressByProvider(provider, chain);
-    if (address) {
-      setFromAddr(address);
-    } else {
-      throw {
-        code: 'NoETHAccount',
-        message: 'Can not find the wallet address by the given provider',
-      };
+    if (isMountedRef) {
+      if (address) {
+        setFromAddr(address);
+      } else {
+        throw {
+          code: "NoETHAccount",
+          message: "Can not find the wallet address by the given provider",
+        };
+      }
     }
   }, [provider, chain]);
 

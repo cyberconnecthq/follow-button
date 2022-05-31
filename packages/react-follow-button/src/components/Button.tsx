@@ -144,8 +144,6 @@ export const FollowButton: FC<FollowButtonProps> & StaticProperty = ({
     setLoading(true);
 
     try {
-      await FollowButton.cyberConnect?.authenticate();
-
       if (following) {
         await unfollow(toAddr);
       } else {
